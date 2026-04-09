@@ -1,0 +1,115 @@
+{{- if .Values.backend.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "undercontrol.backend.fullname" . }}
+  labels:
+    {{- include "undercontrol.backend.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.backend.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "undercontrol.backend.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "undercontrol.backend.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: backend
+          image: {{ include "undercontrol.backend.image" . }}
+          imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          env:
+            - name: ENVIRONMENT
+              value: {{ .Values.backend.environment | quote }}
+            - name: PORT
+              value: "8080"
+            - name: DATABASE_TYPE
+              value: {{ .Values.backend.database.type | quote }}
+            - name: UD_DATA_PATH
+              value: {{ .Values.backend.dataPath | quote }}
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "undercontrol.secretName" . }}
+                  key: jwt-secret
+                  optional: true
+            - name: JWT_EXPIRATION_MINUTES
+              value: {{ .Values.backend.jwt.expirationMinutes | quote }}
+            {{- if eq .Values.backend.database.type "postgres" }}
+            - name: POSTGRES_HOST
+              value: {{ .Values.backend.database.postgres.host | quote }}
+            - name: POSTGRES_PORT
+              value: {{ .Values.backend.database.postgres.port | quote }}
+            - name: POSTGRES_USER
+              value: {{ .Values.backend.database.postgres.user | quote }}
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "undercontrol.secretName" . }}
+                  key: postgres-password
+                  optional: true
+            - name: POSTGRES_DATABASE
+              value: {{ .Values.backend.database.postgres.database | quote }}
+            - name: POSTGRES_SSL_MODE
+              value: {{ .Values.backend.database.postgres.sslMode | quote }}
+            {{- end }}
+            {{- if .Values.backend.s3.enabled }}
+            - name: S3_ENABLED
+              value: "true"
+            - name: S3_ENDPOINT
+              value: {{ .Values.backend.s3.endpoint | quote }}
+            - name: S3_REGION
+              value: {{ .Values.backend.s3.region | quote }}
+            - name: S3_BUCKET
+              value: {{ .Values.backend.s3.bucket | quote }}
+            - name: S3_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "undercontrol.secretName" . }}
+                  key: s3-access-key-id
+                  optional: true
+            - name: S3_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "undercontrol.secretName" . }}
+                  key: s3-secret-access-key
+                  optional: true
+            - name: S3_FORCE_PATH_STYLE
+              value: {{ .Values.backend.s3.forcePathStyle | quote }}
+            {{- end }}
+            {{- if .Values.backend.corsAllowedOrigins }}
+            - name: CORS_ALLOWED_ORIGINS
+              value: {{ .Values.backend.corsAllowedOrigins | quote }}
+            {{- end }}
+            - name: LICENSE_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "undercontrol.secretName" . }}
+                  key: license-token
+                  optional: true
+            {{- with .Values.backend.extraEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- if .Values.backend.persistence.enabled }}
+          volumeMounts:
+            - name: data
+              mountPath: {{ .Values.backend.dataPath }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.backend.resources | nindent 12 }}
+      {{- if .Values.backend.persistence.enabled }}
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ include "undercontrol.backend.fullname" . }}
+      {{- end }}
+{{- end }}

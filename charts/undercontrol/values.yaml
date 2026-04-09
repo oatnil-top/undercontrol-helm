@@ -1,0 +1,142 @@
+# UnDercontrol Helm Chart Values
+
+# -- Backend configuration
+backend:
+  enabled: true
+  replicaCount: 1
+
+  image:
+    repository: ghcr.io/lintaoamons/undercontrol-backend
+    tag: ""  # defaults to Chart appVersion
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    port: 8080
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+  # -- Environment (production or development)
+  environment: production
+
+  # -- JWT configuration
+  jwt:
+    secret: ""  # REQUIRED: set a strong secret
+    expirationMinutes: 60
+
+  # -- Database configuration
+  database:
+    # -- Database type: sqlite or postgres
+    type: sqlite
+    # -- PostgreSQL connection settings (only used when type=postgres)
+    postgres:
+      host: ""
+      port: 5432
+      user: postgres
+      password: ""
+      database: undercontrol
+      sslMode: disable
+
+  # -- S3/R2 object storage (optional)
+  s3:
+    enabled: false
+    endpoint: ""
+    region: auto
+    bucket: ""
+    accessKeyId: ""
+    secretAccessKey: ""
+    forcePathStyle: true
+
+  # -- Data path for local storage (SQLite DB + file uploads)
+  dataPath: /data
+
+  # -- Persistence for local storage (used with SQLite / local file uploads)
+  persistence:
+    enabled: true
+    size: 5Gi
+    storageClass: ""
+    accessMode: ReadWriteOnce
+
+  # -- CORS allowed origins
+  corsAllowedOrigins: ""
+
+  # -- License token
+  licenseToken: ""
+
+  # -- Extra environment variables
+  extraEnv: []
+  # - name: OPENAI_API_KEY
+  #   value: "sk-..."
+
+  # -- Use an existing Secret for sensitive values
+  # Keys: jwt-secret, postgres-password, s3-access-key-id, s3-secret-access-key, license-token
+  existingSecret: ""
+
+# -- Frontend configuration
+frontend:
+  enabled: true
+  replicaCount: 1
+
+  image:
+    repository: ghcr.io/lintaoamons/undercontrol-frontend
+    tag: ""  # defaults to Chart appVersion
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    port: 80
+
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+
+  # -- Extra environment variables
+  extraEnv: []
+
+# -- Ingress configuration
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  # -- Host-based routing
+  hosts:
+    - host: ud.example.com
+      paths:
+        - path: /api
+          pathType: Prefix
+          service: backend
+        - path: /
+          pathType: Prefix
+          service: frontend
+  tls: []
+  #  - secretName: ud-tls
+  #    hosts:
+  #      - ud.example.com
+
+# -- NodePort configuration (alternative to Ingress)
+# Set backend.service.type and/or frontend.service.type to NodePort
+# backend:
+#   service:
+#     type: NodePort
+#     nodePort: 30880
+# frontend:
+#   service:
+#     type: NodePort
+#     nodePort: 30800
+
+# -- Image pull secrets
+imagePullSecrets: []
+
+# -- Override chart name
+nameOverride: ""
+fullnameOverride: ""

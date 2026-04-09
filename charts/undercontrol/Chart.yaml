@@ -1,0 +1,16 @@
+apiVersion: v2
+name: undercontrol
+description: A Helm chart for deploying UnDercontrol - task management and productivity platform
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+keywords:
+  - undercontrol
+  - task-management
+  - productivity
+home: https://github.com/lintaoamons/undercontrol-helm
+sources:
+  - https://github.com/lintaoamons/undercontrol-helm
+maintainers:
+  - name: lintaoamons
+    url: https://github.com/lintaoamons
