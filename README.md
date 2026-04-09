@@ -1,13 +1,13 @@
 # UnDercontrol Helm Charts
 
-Helm charts for deploying [UnDercontrol](https://github.com/lintaoamons/undercontrol) on Kubernetes.
+Helm charts for deploying [UnDercontrol](https://github.com/oatnil-top/undercontrol) on Kubernetes.
 
 ## Usage
 
 ### Add the Helm repository
 
 ```bash
-helm repo add undercontrol https://lintaoamons.github.io/undercontrol-helm
+helm repo add undercontrol https://oatnil-top.github.io/undercontrol-helm
 helm repo update
 ```
 
@@ -44,7 +44,7 @@ helm install undercontrol undercontrol/undercontrol \
 ### Install via OCI registry
 
 ```bash
-helm install undercontrol oci://ghcr.io/lintaoamons/undercontrol \
+helm install undercontrol oci://ghcr.io/oatnil-top/undercontrol \
   --set backend.jwt.secret=my-secret-key
 ```
 
