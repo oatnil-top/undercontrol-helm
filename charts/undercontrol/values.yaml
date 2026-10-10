@@ -6,7 +6,7 @@ backend:
   replicaCount: 1
 
   image:
-    repository: ghcr.io/lintaoamons/undercontrol-backend
+    repository: docker.io/lintao0o0/undercontrol-backend
     tag: ""  # defaults to Chart appVersion
     pullPolicy: IfNotPresent
 
@@ -66,8 +66,30 @@ backend:
   # -- CORS allowed origins
   corsAllowedOrigins: ""
 
-  # -- License token
+  # -- Pro/Max license token (LICENSE_TOKEN)
   licenseToken: ""
+  # -- Host secret the license token was issued for (LICENSE_HOST_SECRET).
+  # A token without its matching host secret does not activate.
+  licenseHostSecret: ""
+
+  # -- Admin account created on first start (ADMIN_EMAIL / ADMIN_PASSWORD).
+  # A server with a Pro or Max license refuses to start without admin.email.
+  admin:
+    email: ""
+    password: ""
+
+  # -- Let other people sign up (REGISTRATION_ENABLED). Default: only the admin can log in.
+  registrationEnabled: false
+
+  # -- Public URL users open the app at, e.g. https://ud.example.com (HOST_DOMAIN,
+  # required by the server: it builds file download/upload URLs from it).
+  # Empty: the first ingress host when ingress is enabled, otherwise
+  # http://localhost:3000 (the port-forward printed after install).
+  hostDomain: ""
+
+  # -- Pod security context. fsGroup lets the non-root backend (uid 1000) write the PVC.
+  podSecurityContext:
+    fsGroup: 1000
 
   # -- Extra environment variables
   extraEnv: []
@@ -75,7 +97,8 @@ backend:
   #   value: "sk-..."
 
   # -- Use an existing Secret for sensitive values
-  # Keys: jwt-secret, postgres-password, s3-access-key-id, s3-secret-access-key, license-token
+  # Keys: jwt-secret, postgres-password, s3-access-key-id, s3-secret-access-key,
+  #       license-token, license-host-secret, admin-password
   existingSecret: ""
 
 # -- Frontend configuration
@@ -84,7 +107,7 @@ frontend:
   replicaCount: 1
 
   image:
-    repository: ghcr.io/lintaoamons/undercontrol-frontend
+    repository: docker.io/lintao0o0/undercontrol-vite-app
     tag: ""  # defaults to Chart appVersion
     pullPolicy: IfNotPresent
 
@@ -99,6 +122,9 @@ frontend:
     limits:
       cpu: 200m
       memory: 256Mi
+
+  # -- Upload size limit on the /api/v1 proxy (nginx client_max_body_size)
+  clientMaxBodySize: 100m
 
   # -- Extra environment variables
   extraEnv: []

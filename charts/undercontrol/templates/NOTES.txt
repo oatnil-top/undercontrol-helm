@@ -1,0 +1,18 @@
+UnDercontrol {{ .Chart.AppVersion }} is installed in namespace {{ .Release.Namespace }}.
+{{- if .Values.ingress.enabled }}
+
+Open: {{ range .Values.ingress.hosts }}http{{ if $.Values.ingress.tls }}s{{ end }}://{{ .host }} {{ end }}
+{{- else if .Values.frontend.enabled }}
+
+Open it locally:
+  kubectl -n {{ .Release.Namespace }} port-forward svc/{{ include "undercontrol.frontend.fullname" . }} 3000:{{ .Values.frontend.service.port }}
+  then browse to http://localhost:3000
+{{- end }}
+{{- if .Values.backend.admin.email }}
+
+Log in as {{ .Values.backend.admin.email }} with the admin password you set.
+{{- end }}
+{{- if not .Values.backend.jwt.secret }}
+
+WARNING: backend.jwt.secret is empty. Set it to a long random string.
+{{- end }}

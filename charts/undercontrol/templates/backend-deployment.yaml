@@ -1,4 +1,7 @@
 {{- if .Values.backend.enabled }}
+{{- if and .Values.backend.licenseToken (not .Values.backend.admin.email) }}
+{{- fail "backend.licenseToken is set but backend.admin.email is not: a Pro/Max server refuses to start without an admin account. Add --set backend.admin.email=... --set backend.admin.password=..." }}
+{{- end }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -7,6 +10,11 @@ metadata:
     {{- include "undercontrol.backend.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.backend.replicaCount }}
+  {{- if eq .Values.backend.database.type "sqlite" }}
+  # SQLite lives on a ReadWriteOnce PVC: never run the old and new pod at once.
+  strategy:
+    type: Recreate
+  {{- end }}
   selector:
     matchLabels:
       {{- include "undercontrol.backend.selectorLabels" . | nindent 6 }}
@@ -17,6 +25,10 @@ spec:
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.backend.podSecurityContext }}
+      securityContext:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       containers:
@@ -96,6 +108,26 @@ spec:
                   name: {{ include "undercontrol.secretName" . }}
                   key: license-token
                   optional: true
+            - name: LICENSE_HOST_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "undercontrol.secretName" . }}
+                  key: license-host-secret
+                  optional: true
+            {{- if .Values.backend.admin.email }}
+            - name: ADMIN_EMAIL
+              value: {{ .Values.backend.admin.email | quote }}
+            {{- end }}
+            - name: ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "undercontrol.secretName" . }}
+                  key: admin-password
+                  optional: true
+            - name: REGISTRATION_ENABLED
+              value: {{ .Values.backend.registrationEnabled | quote }}
+            - name: HOST_DOMAIN
+              value: {{ include "undercontrol.hostDomain" . | quote }}
             {{- with .Values.backend.extraEnv }}
             {{- toYaml . | nindent 12 }}
             {{- end }}

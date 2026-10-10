@@ -112,3 +112,17 @@ Secret name for sensitive values
 {{- include "undercontrol.fullname" . }}
 {{- end }}
 {{- end }}
+
+{{/*
+External base URL (HOST_DOMAIN): explicit value, else the first ingress host,
+else the local port-forward address printed in NOTES.txt.
+*/}}
+{{- define "undercontrol.hostDomain" -}}
+{{- if .Values.backend.hostDomain }}
+{{- .Values.backend.hostDomain | trimSuffix "/" }}
+{{- else if and .Values.ingress.enabled .Values.ingress.hosts }}
+{{- printf "%s://%s" (ternary "https" "http" (not (empty .Values.ingress.tls))) (index .Values.ingress.hosts 0).host }}
+{{- else }}
+{{- print "http://localhost:3000" }}
+{{- end }}
+{{- end }}
