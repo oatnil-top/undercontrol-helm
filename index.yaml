@@ -2,6 +2,27 @@ apiVersion: v1
 entries:
   undercontrol:
   - apiVersion: v2
+    appVersion: 0.183.0
+    created: "2026-11-07T16:31:16.354225904Z"
+    description: A Helm chart for deploying UnDercontrol - task management and productivity
+      platform
+    digest: 5c3a75e121bf700d608f9e137d64c79baee6dd786fee7f29c7832230a39e4f03
+    home: https://github.com/oatnil-top/undercontrol-helm
+    keywords:
+    - undercontrol
+    - task-management
+    - productivity
+    maintainers:
+    - name: oatnil-top
+      url: https://github.com/oatnil-top
+    name: undercontrol
+    sources:
+    - https://github.com/oatnil-top/undercontrol-helm
+    type: application
+    urls:
+    - https://github.com/oatnil-top/undercontrol-helm/releases/download/undercontrol-0.183.0/undercontrol-0.183.0.tgz
+    version: 0.183.0
+  - apiVersion: v2
     appVersion: 0.182.1
     created: "2026-11-06T10:57:07.797669958Z"
     description: A Helm chart for deploying UnDercontrol - task management and productivity
@@ -526,4 +547,4 @@ entries:
     urls:
     - https://github.com/oatnil-top/undercontrol-helm/releases/download/undercontrol-0.65.2/undercontrol-0.65.2.tgz
     version: 0.65.2
-generated: "2026-11-06T10:57:07.798251273Z"
+generated: "2026-11-07T16:31:16.354406122Z"
