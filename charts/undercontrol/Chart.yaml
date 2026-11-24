@@ -2,8 +2,8 @@ apiVersion: v2
 name: undercontrol
 description: A Helm chart for deploying UnDercontrol - task management and productivity platform
 type: application
-version: 0.193.0
-appVersion: "0.193.0"
+version: 0.194.1
+appVersion: "0.194.1"
 keywords:
   - undercontrol
   - task-management
