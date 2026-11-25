@@ -1,6 +1,6 @@
 # UnDercontrol Helm Charts
 
-Helm charts for deploying [UnDercontrol](https://github.com/oatnil-top/undercontrol) on Kubernetes.
+Helm charts for deploying [UnDercontrol](https://udctl.com) on Kubernetes.
 
 ## Usage
 
