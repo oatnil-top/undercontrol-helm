@@ -51,13 +51,6 @@ helm install undercontrol undercontrol/undercontrol \
   --set frontend.service.nodePort=30800
 ```
 
-### Install via OCI registry
-
-```bash
-helm install undercontrol oci://ghcr.io/oatnil-top/undercontrol \
-  --set backend.jwt.secret=my-secret-key
-```
-
 ## Configuration
 
 See [values.yaml](charts/undercontrol/values.yaml) for the full list of configurable parameters.
